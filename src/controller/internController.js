@@ -59,14 +59,14 @@ const createIntern = async function (req, res) {
 const getCollegeData= async function(req,res){
 
     try{
-        if(!Object.keys(req.body).includes("collegeName")) return res.status(400).send({status:false,msg : "Wrong params in given"})
+        if(!Object.keys(req.query).includes("collegeName")) return res.status(400).send({status:false,msg : "Wrong params in given"})
 
         let collegeName = req.query.collegeName
         if(!collegeName){
             return res.status(400).send({status:false,msg:"collegeName required"})
         }
-        let collegeData = await collegeModel.findOne({"name":collegeName})
-        if(collegeData.length == 0){
+        let collegeData = await collegeModel.findOne({name:collegeName,isDeleted : false})
+        if(!collegeData){
              return res.status(404).send({status:false,msg:"College not found "})
         } 
         let result = {
@@ -75,7 +75,7 @@ const getCollegeData= async function(req,res){
             logoLink:collegeData.logoLink
         }
         let id = collegeData._id
-        let interestedIntern = await internModel.find({collegeId:id}).select({name:1,email:1,mobile:1})
+        let interestedIntern = await internModel.find({collegeId:id,isDeleted:false}).select({name:1,email:1,mobile:1})
         if(interestedIntern.length ==0){
             result.interest = "No intern applied till now"
             return res.status(200).send({status:false,msg:result})
