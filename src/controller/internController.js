@@ -24,7 +24,7 @@ const createIntern = async function (req, res) {
         return res.status(400).send({status:false, msg:"Please Enter the name"})
     }
     if(!internData.collegeId){
-        return req.status(400).send({status:false, msg:"Please enter College ID"})
+        return res.status(400).send({status:false, msg:"Please enter College ID"})
     }
     
     if(!ObjectId.isValid(internData.collegeId)){
@@ -40,8 +40,8 @@ const createIntern = async function (req, res) {
 
     if(dupMobile) return res.status(400).send({status:false,msg:"mobile number is already registered"})
     // valid email 
-    if(!(/^\w+([\.-]?\w+)@\w+([\. -]?\w+)(\.\w{2,3})+$/.test(internData.email))){
-        return res.status(400).send({status:false,msg:"email is not valid"})
+    if(!(/^\w+([\.-]?\w+)@\w+([\. -]?\w+)(\.\w{2,3})+$/.test(internData.email.trim()))){
+        return res.status(400).send({status:false,msg:"email ID is not valid"})
     }
     let dupEmail = await internModel.findOne({email : internData.email})
     
@@ -59,23 +59,25 @@ const createIntern = async function (req, res) {
 const getCollegeData= async function(req,res){
 
     try{
+        if(!Object.keys(req.body).includes("collegeName")) return res.status(400).send({status:false,msg : "Wrong params in given"})
+
         let collegeName = req.query.collegeName
         if(!collegeName){
             return res.status(400).send({status:false,msg:"collegeName required"})
         }
         let collegeData = await collegeModel.findOne({"name":collegeName})
         if(collegeData.length == 0){
-             return res.status(404).send({status:false,msg:"not found "})
+             return res.status(404).send({status:false,msg:"College not found "})
         } 
         let result = {
             name: collegeData.name,
             fullName : collegeData.fullName,
             logoLink:collegeData.logoLink
         }
-        let id = collegeData._id.toString()
+        let id = collegeData._id
         let interestedIntern = await internModel.find({collegeId:id}).select({name:1,email:1,mobile:1})
         if(interestedIntern.length ==0){
-            result['interest'] = "No intern apply now"
+            result.interest = "No intern applied till now"
             return res.status(200).send({status:false,msg:result})
         }
         result.interest = interestedIntern

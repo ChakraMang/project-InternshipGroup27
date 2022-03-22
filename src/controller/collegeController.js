@@ -14,24 +14,24 @@ const createCollege = async function (req, res) {
         // validate body request
         let collegeData = req.body
         if (Object.keys(collegeData) == 0 || collegeData == undefined || collegeData == null) {
-            return res.status(400).send({ status: false, msg: "required college data" })
+            return res.status(400).send({ status: false, msg: "college data is required" })
         }
         // validate name
 
         if (!isValid(collegeData.name)) {
-            return res.status(400).send({ status: false, msg: "required name" })
+            return res.status(400).send({ status: false, msg: "name is required" })
 
         }
         // validate Fullname
 
         if (!isValid(collegeData.fullName)) {
-            return res.status(400).send({ status: false, msg: "required fullName of college" })
+            return res.status(400).send({ status: false, msg: "fullName of college is required" })
         }
         // validate link
 
         let url = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
         if (!isValid(collegeData.logoLink)) {
-            return res.status(400).send({ status: false, msg: "required logoLink" })
+            return res.status(400).send({ status: false, msg: "logoLink is required" })
         }
         // if (!url.test(link)) {
         //     return res.status(404).send({ status: false, msg: "invalid logoLink" })
