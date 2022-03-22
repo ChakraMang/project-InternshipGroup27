@@ -30,7 +30,7 @@ const createIntern = async function (req, res) {
     if(!ObjectId.isValid(internData.collegeId)){
         return res.status(400).send({status:false,msg:"Invalid College ID"})
     }
-    let college = await collegeModel.findById(internData.collegeId)
+    let college = await collegeModel.findOne({_id : internData.collegeId, isDeleted:false})
     if(!college) return res.status(400).send({status : false, msg : " No College found for the specific college ID"})
     // valid mobile number
     if(!(/^([+]\d{2})?\d{10}$/.test(internData.mobile))){
@@ -48,10 +48,17 @@ const createIntern = async function (req, res) {
     if(dupEmail) return res.status(400).send({status:false,msg:"email ID is already registered"})
     
     let savedData = await internModel.create(internData); 
-    res.status(201).send({status:true, data : savedData})
+    let result = {
+        isDeleted : savedData.isDeleted,
+        name: savedData.name,
+        email:savedData.email,
+        mobile:savedData.mobile,
+        collegeId : savedData.collegeId
+    }
+    return res.status(201).send({status:true, data : result})
     }
     catch (err) {
-        res.status(500).send({ status: false, msg: err.message })
+        return res.status(500).send({ status: false, msg: err.message })
     }
 }
 
@@ -74,8 +81,7 @@ const getCollegeData= async function(req,res){
             fullName : collegeData.fullName,
             logoLink:collegeData.logoLink
         }
-        let id = collegeData._id
-        let interestedIntern = await internModel.find({collegeId:id,isDeleted:false}).select({name:1,email:1,mobile:1})
+        let interestedIntern = await internModel.find({collegeId:collegeData._id,isDeleted:false}).select({name:1,email:1,mobile:1})
         if(interestedIntern.length ==0){
             result.interest = "No intern applied till now"
             return res.status(200).send({status:false,msg:result})

@@ -33,10 +33,10 @@ const createCollege = async function (req, res) {
         if (!isValid(collegeData.logoLink)) {
             return res.status(400).send({ status: false, msg: "logoLink is required" })
         }
-        // if (!url.test(link)) {
-        //     return res.status(404).send({ status: false, msg: "invalid logoLink" })
-        // }
-        //checking duplicate entries of college
+        if (!/((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/.test(collegeData.logoLink)) {
+            return res.status(400).send({ status: false, msg: "please enter valid link" })
+
+        }
         let duplicateData = await collegeModel.findOne({ name: collegeData.name})
         if (duplicateData) {
             return res.status(400).send({ status: false, msg: "college with this name is already present" })
@@ -44,7 +44,13 @@ const createCollege = async function (req, res) {
         //finally create a collegeModel
 
         let collegeCreate = await collegeModel.create(collegeData)
-        return res.status(201).send({ status: true, data: collegeCreate })
+        let result = {
+            name: collegeCreate.name,
+            fullName : collegeCreate.fullName,
+            logoLink : collegeCreate.logoLink,
+            isDeleted : collegeCreate.isDeleted
+        }
+        return res.status(201).send({ status: true, data: result })
 
     }
     catch (err) {
