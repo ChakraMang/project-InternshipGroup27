@@ -59,30 +59,28 @@ const createIntern = async function (req, res) {
 const getCollegeData= async function(req,res){
 
     try{
-        let collegeName = req.query
-    if(!collegeName){
-        return res.status(400).send({status:false,msg:"collegeName required"})
-    }
-    let collegeData = await collegeModel.find({name:collegeName.name})
-    if(collegeData.length == 0){
-         return res.status(404).send({status:false,msg:"not found "})
-    } 
-    let interestedIntern = await internModel.find({collegeId:collegeData._id})
-    let college = { 
-        name:collegeData.name,
-        fullName:collegeData.fullName , 
-        logoLink:collegeData.logoLink
-
-    }
-    if(interestedIntern.length>0){
-        college['interests'] = interestedIntern
-        return res.send(200).send({status:true,data:college})
-    }
-    if(interestedIntern.length ==0){
-        college ['interest'] = "No intern apply now"
-        return res.status(200).send({status:false,msg:college})
-    }
-    
+        let collegeName = req.query.collegeName
+        if(!collegeName){
+            return res.status(400).send({status:false,msg:"collegeName required"})
+        }
+        let collegeData = await collegeModel.findOne({"name":collegeName})
+        if(collegeData.length == 0){
+             return res.status(404).send({status:false,msg:"not found "})
+        } 
+        let result = {
+            name: collegeData.name,
+            fullName : collegeData.fullName,
+            logoLink:collegeData.logoLink
+        }
+        let id = collegeData._id.toString()
+        let interestedIntern = await internModel.find({collegeId:id}).select({name:1,email:1,mobile:1})
+        if(interestedIntern.length ==0){
+            result['interest'] = "No intern apply now"
+            return res.status(200).send({status:false,msg:result})
+        }
+        result.interest = interestedIntern
+        return res.status(200).send({status:true,data:result})
+        
     }
     catch(err){
         return res.status(500).send({status:false,msg: err.message})
