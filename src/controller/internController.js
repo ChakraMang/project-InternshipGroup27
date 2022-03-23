@@ -2,18 +2,9 @@ const internModel = require('../models/internModel')
 const collegeModel = require('../models/collegeModel')
 const ObjectId = require('mongoose').Types.ObjectId
 
- 
-const isValid = function (value){
-    if(typeof value == 'undefined'|| value ===null) return false
-    if (typeof value == 'string' && value.trim().length ===0) return false
-    return true
-}
-
-
-
 const createIntern = async function (req, res) {
     try {
-        let internData = req.body;
+    let internData = req.body;
     if(Object.keys(internData) == 0){
         return res.status(400).send({status:false, msg:"Please Enter the details of Intern"})
     }
@@ -21,13 +12,13 @@ const createIntern = async function (req, res) {
     if(!internData.name) return res.status(400).send({status:false, msg : " name is required"})
     
     if(internData.name.trim().length == 0){
-        return res.status(400).send({status:false, msg:"Please Enter the name"})
+        return res.status(400).send({status:false, msg:"Please Enter the proper name"})
     }
     if(!internData.collegeId){
         return res.status(400).send({status:false, msg:"Please enter College ID"})
     }
     
-    if(!ObjectId.isValid(internData.collegeId)){
+    if(!ObjectId.isValid(internData.collegeId.trim())){
         return res.status(400).send({status:false,msg:"Invalid College ID"})
     }
     let college = await collegeModel.findOne({_id : internData.collegeId, isDeleted:false})
@@ -66,7 +57,7 @@ const createIntern = async function (req, res) {
 const getCollegeData= async function(req,res){
 
     try{
-        if(!Object.keys(req.query).includes("collegeName")) return res.status(400).send({status:false,msg : "Wrong params in given"})
+        if(!Object.keys(req.query).includes("collegeName")) return res.status(400).send({status:false,msg : "Wrong params is given"})
 
         let collegeName = req.query.collegeName
         if(!collegeName){

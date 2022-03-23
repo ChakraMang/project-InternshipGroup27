@@ -1,4 +1,5 @@
 
+const { create } = require("../models/collegeModel")
 const collegeModel = require("../models/collegeModel")
 
 const isValid = function (value) {
@@ -6,7 +7,9 @@ const isValid = function (value) {
     if (typeof value == 'string' && value.trim().length === 0) return false
     return true
 }
-
+const fluc = function(name) {
+    return name.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
 
 //=========create college============
 const createCollege = async function (req, res) {
@@ -19,7 +22,7 @@ const createCollege = async function (req, res) {
         // validate name
 
         if (!isValid(collegeData.name)) {
-            return res.status(400).send({ status: false, msg: "name is required" })
+            return res.status(400).send({ status: false, msg: "name of college is required" })
 
         }
         // validate Fullname
@@ -28,8 +31,6 @@ const createCollege = async function (req, res) {
             return res.status(400).send({ status: false, msg: "fullName of college is required" })
         }
         // validate link
-
-        let url = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
         if (!isValid(collegeData.logoLink)) {
             return res.status(400).send({ status: false, msg: "logoLink is required" })
         }
@@ -44,9 +45,12 @@ const createCollege = async function (req, res) {
         //finally create a collegeModel
 
         let collegeCreate = await collegeModel.create(collegeData)
+        let fullName1 = collegeCreate.fullName
+        
+        let firstUpperCare = fluc(fullName1)
         let result = {
             name: collegeCreate.name,
-            fullName : collegeCreate.fullName,
+            fullName : firstUpperCare,
             logoLink : collegeCreate.logoLink,
             isDeleted : collegeCreate.isDeleted
         }
