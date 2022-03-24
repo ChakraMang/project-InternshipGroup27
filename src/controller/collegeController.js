@@ -30,7 +30,8 @@ const createCollege = async function (req, res) {
         if (!isValid(collegeData.fullName)) {
             return res.status(400).send({ status: false, msg: "fullName of college is required" })
         }
-        // validate link
+        // validate link 
+        // destructuring use
         if (!isValid(collegeData.logoLink)) {
             return res.status(400).send({ status: false, msg: "logoLink is required" })
         }
@@ -45,12 +46,10 @@ const createCollege = async function (req, res) {
         //finally create a collegeModel
 
         let collegeCreate = await collegeModel.create(collegeData)
-        let fullName1 = collegeCreate.fullName
-        
-        let firstUpperCare = fluc(fullName1)
+        let firstUpperCase = fluc(collegeCreate.fullName)
         let result = {
             name: collegeCreate.name,
-            fullName : firstUpperCare,
+            fullName : firstUpperCase,
             logoLink : collegeCreate.logoLink,
             isDeleted : collegeCreate.isDeleted
         }
